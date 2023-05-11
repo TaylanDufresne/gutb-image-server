@@ -39,7 +39,7 @@ app.post("/", async (req, res) => {
 app.use('/static', express.static('track_images'))
 
 app.listen(port)
-
+console.log(`GUTB image server up and listening on port:${port}`)
 
 function buildTrack(data) {
 
