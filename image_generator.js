@@ -51,7 +51,7 @@ https.createServer(options, app)
 });
 
 function buildTrack(data) {
-
+// Deprecated at the moment, but I would like this to be capable of generating track images as well
     // Maximum canvas size is 16383, most chromosomes will have more base pairs than this
     let pixelWidth = 16383
     let height = 1
@@ -110,5 +110,5 @@ function buildTrack(data) {
         let sending = canvas.toBuffer("image/webp")
         // fs.writeFileSync("./" + chromosome +"server_generated.png", canvas.toBuffer("image/png"))
         return sending
+  
 }
-
