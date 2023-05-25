@@ -1,8 +1,10 @@
 
 const port = process.env.PORT || 3010;
+const https = require("https")
 const cors = require("cors");
 const { createCanvas, loadImage } = require('canvas');
 const fs = require("fs")
+const express = require('express')
 
 
 const corsOptions = {
@@ -12,7 +14,6 @@ const corsOptions = {
 }
 
 
-const express = require('express')
 const app = express()
 
 
@@ -36,10 +37,18 @@ app.post("/", async (req, res) => {
 
 })
 
+
+const options ={ 
+    key: fs.readFileSync("server.key"),
+    cert: fs.readFileSync("server.cert"),
+};
+
 app.use('/static', express.static('track_images'))
 
-app.listen(port)
-console.log(`GUTB image server up and listening on port:${port}`)
+https.createServer(options, app)
+.listen(port, function (req, res) {
+  console.log(`GUTB image server up and listening on port:${port}`);
+});
 
 function buildTrack(data) {
 
@@ -101,68 +110,5 @@ function buildTrack(data) {
         let sending = canvas.toBuffer("image/webp")
         // fs.writeFileSync("./" + chromosome +"server_generated.png", canvas.toBuffer("image/png"))
         return sending
-
-
-  
 }
 
-// pixel_width = int(input("How many pixels?:\n"))
-//     print("Parsing files...")
-//     dataset = read_bed_file(bed_file)
-
-//     statement = "Generating dark " if dark else "Generating light "
-//     background_color = 18 if dark else 255
-
-//     overview_bar = ChargingBar("Overall Progress", max=len(dataset.keys()))
-//     for x in dataset.keys():
-
-//         last_bp = max(dataset[x].items(), key=lambda a: a[1]['end'])
-//         gap = dataset[x][0]['end']
-//         last_bp = last_bp[1]['end']
-//         number_of_entries = len(dataset[x])
-
-//         total = pixel_width
-
-//         bp_ratio = last_bp / total
-//         adjustment = round(last_bp / bp_ratio)
-//         rounded_bp_ratio = round(last_bp / total)
-//         pixels_per_block = round(total/number_of_entries)
-//         # print(pixels_per_block)
-//         # print(rounded_bp_ratio)
-
-//         if bp_ratio != 0:
-//             # print(statement + x + " methylation image with " +
-//             #       str(total) + " pixels...")
-//             # print("Resolution: " + str(rounded_bp_ratio) + " base pairs per pixel")
-//             heatmap_image = Image.new('RGBA', (adjustment, 1))
-//             histogram_image = Image.new('RGBA', (adjustment, 1000))
-//             previous = -1
-//             # bar = Bar("Chromosome", max=len(dataset[x].keys()))
-//             for block in dataset[x]:
-//                 if previous > dataset[x][block]['start']:
-//                     print("File out of order.")
-//                     exit(-1)
-//                 previous = dataset[x][block]['start']
-//                 value = dataset[x][block]['value']
-//                 alpha = int(255 * ((100 - value) / 100))
-//                 value = value * 10
-//                 spacing = int(dataset[x][block]['start'] / gap)
-
-//                 for z in range(0, pixels_per_block):
-//                     placement = int(z + int(spacing * pixels_per_block))
-//                     if placement < total:
-//                         heatmap_image.putpixel((placement, 0), (background_color, background_color,
-//                                                                 background_color, alpha))
-//                         for n in range(0, 999 - value):
-//                             histogram_image.putpixel((placement, n), (background_color, background_color,
-//                                                                       background_color, 255))
-
-//             # print("Successfully made track image! Saving...")
-//             suffix = "_methylation_dark.png" if dark else "_methylation.png"
-//             heatmap_image.save(image_path + "/" + x + "_" + str(int(pixel_width / 1000)) + "K_heatmap" + suffix,
-//                                "PNG")
-//             histogram_image.save(image_path + "/" + x + "_" + str(int(pixel_width / 1000)) + "K_histogram" + suffix,
-//                                "PNG")
-//             # bar.next()
-//             overview_bar.next()
-//     overview_bar.finish()
